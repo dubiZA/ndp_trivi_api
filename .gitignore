@@ -130,3 +130,5 @@ dmypy.json
 
 # Personal stuff
 .vscode
+backend/flask_setup.sh
+backend/pre_test_setup.sh
