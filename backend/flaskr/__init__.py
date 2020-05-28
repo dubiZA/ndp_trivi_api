@@ -24,7 +24,7 @@ def create_app(test_config=None):
         return response
 
     '''
-    ERROR HANDLING
+    ERROR HANDLERS
     '''
     @app.errorhandler(400)
     def bad_request(error):
@@ -58,6 +58,14 @@ def create_app(test_config=None):
             'message': 'Unprocessable'
         }), 422
 
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'Internal Server Error'
+        }), 500
+
 
     '''
   @TODO: 
@@ -67,13 +75,16 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/categories')
     def get_categories():
-        categories = Category.query.all()
-        formatted_categories = [category.format() for category in categories]
+        try:
+            categories = Category.query.all()
+            formatted_categories = [category.format() for category in categories]
 
-        return jsonify({
-            'success': True,
-            'categories': formatted_categories
-        })
+            return jsonify({
+                'success': True,
+                'categories': formatted_categories
+            })
+        except:
+            abort(500)
 
     '''
   @TODO: 
