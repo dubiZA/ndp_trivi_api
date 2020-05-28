@@ -21,8 +21,43 @@ def create_app(test_config=None):
                              'Content-Type,Authorization,true')
         response.headers.add('Access-Control-Allow-Headers',
                              'GET,PATH,POST,DELETE,OPTIONS')
-
         return response
+
+    '''
+    ERROR HANDLING
+    '''
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'Bad Request'
+        }), 400
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'success': False,
+            'error': 404,
+            'message': 'Resource Not Found'
+        }), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            'success': False,
+            'error': 405,
+            'message': 'Method Not Allowed'
+        }), 405
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+            'success': False,
+            'error': 422,
+            'message': 'Unprocessable'
+        }), 422
+
 
     '''
   @TODO: 
@@ -32,7 +67,13 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/categories')
     def get_categories():
-        pass
+        categories = Category.query.all()
+        formatted_categories = [category.format() for category in categories]
+
+        return jsonify({
+            'success': True,
+            'categories': formatted_categories
+        })
 
     '''
   @TODO: 

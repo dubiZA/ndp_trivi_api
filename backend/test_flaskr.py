@@ -36,10 +36,10 @@ class TriviaTestCase(unittest.TestCase):
     def test_get_all_categories(self):
         response = self.client().get('/api/v1/categories')
         data = json.loads(response.data)
-
+        
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['success'], True)
-        self.assertTrue(response.data['categories'], True)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'], True)
 
 
 # Make the tests conveniently executable
