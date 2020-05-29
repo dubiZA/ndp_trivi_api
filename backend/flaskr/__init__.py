@@ -13,10 +13,14 @@ def paginate(request, selection):
     start = (page - 1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
 
-    questions = [question.format() for question in selection]
-    current_questions = questions[start:end]
+    all_questions = [question.format() for question in selection]
+    current_questions = all_questions[start:end]
 
-    return current_questions
+    return {
+        'total_questions': len(all_questions),
+        'current_page': page,
+        'current_questions': current_questions
+    }
 
 
 
@@ -87,7 +91,7 @@ def create_app(test_config=None):
     @app.route('/api/v1/categories')
     def get_categories():
         try:
-            categories = Category.query.all()
+            categories = Category.query.order_by(Category.id).all()
             formatted_categories = [category.format()['type'] for category in categories]
 
             return jsonify({
@@ -111,7 +115,18 @@ def create_app(test_config=None):
   '''
     @app.route('/api/v1/questions')
     def get_questions():
-        pass
+        all_questions = Question.query.order_by(Question.id).all()
+        current_questions = paginate(request, all_questions)
+
+        if len(current_questions['current_questions']) == 0:
+            abort(404)
+        
+        return jsonify({
+            'success': True,
+            'questions': current_questions['current_questions'],
+            'total_questions': current_questions['total_questions'],
+            'current_page': current_questions['current_page']
+        })
 
 
     '''
