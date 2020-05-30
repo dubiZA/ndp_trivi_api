@@ -49,6 +49,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
+        
 
     def test_get_paginated_questions_invalid_page(self):
         response = self.client().get('/api/v1/questions?page=1000')
