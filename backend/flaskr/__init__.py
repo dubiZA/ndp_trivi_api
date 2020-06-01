@@ -73,14 +73,6 @@ def create_app(test_config=None):
             'message': 'Unprocessable'
         }), 422
 
-    @app.errorhandler(500)
-    def internal_server_error(error):
-        return jsonify({
-            'success': False,
-            'error': 500,
-            'message': 'Internal Server Error'
-        }), 500
-
 
 #     '''
 #   @TODO: 
@@ -99,20 +91,20 @@ def create_app(test_config=None):
                 'categories': formatted_categories
             })
         except:
-            abort(500)
+            abort(400)
 
-    '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+#     '''
+#   @TODO: 
+#   Create an endpoint to handle GET requests for questions, 
+#   including pagination (every 10 questions). 
+#   This endpoint should return a list of questions, 
+#   number of total questions, current category, categories. 
 
-  TEST: At this point, when you start the application
-  you should see questions and categories generated,
-  ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
-  '''
+#   TEST: At this point, when you start the application
+#   you should see questions and categories generated,
+#   ten questions per page and pagination at the bottom of the screen for three pages.
+#   Clicking on the page numbers should update the questions. 
+#   '''
     @app.route('/api/v1/questions')
     def get_questions():
         all_questions = Question.query.order_by(Question.id).all()
@@ -127,19 +119,40 @@ def create_app(test_config=None):
             'success': True,
             'questions': current_questions['current_questions'],
             'categories': formatted_categories,
-            'current_category': None,
+            'current_category': 'Placeholder',
             'total_questions': current_questions['total_questions'],
             'current_page': current_questions['current_page']
         })
 
 
-    '''
-  @TODO: 
-  Create an endpoint to DELETE question using a question ID. 
+#     '''
+#   @TODO: 
+#   Create an endpoint to DELETE question using a question ID. 
 
-  TEST: When you click the trash icon next to a question, the question will be removed.
-  This removal will persist in the database and when you refresh the page. 
-  '''
+#   TEST: When you click the trash icon next to a question, the question will be removed.
+#   This removal will persist in the database and when you refresh the page. 
+#   '''
+    @app.route('/api/v1/questions/<int:question_id>', methods=['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.filter_by(id=question_id).one_or_none()
+        
+        if question is None:
+                abort(404)
+
+        try:
+            question.delete()
+            all_questions = Question.query.order_by(Question.id).all()
+            current_questions = paginate(request, all_questions)
+
+            return jsonify({
+                'success': True,
+                'deleted': question_id,
+                'questions': current_questions['current_questions'],
+                'total_questions': current_questions['total_questions'],
+                'current_page': current_questions['current_page']
+            })
+        except:
+            abort(422)
     '''
   @TODO: 
   Create an endpoint to POST a new question, 

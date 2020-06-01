@@ -49,7 +49,8 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
-        
+        self.assertTrue(len(data['categories']))
+        self.assertTrue(data['current_category'])
 
     def test_get_paginated_questions_invalid_page(self):
         response = self.client().get('/api/v1/questions?page=1000')
@@ -58,6 +59,26 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource Not Found')
+
+    def test_delete_question_success(self):
+        question_id = 20
+        response = self.client().delete(f'/api/v1/questions/{question_id}')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], question_id)
+        self.assertTrue(len(data['questions']))
+
+    def test_delete_question_not_found(self):
+        question_id = 1000
+        response = self.client().delete(f'/api/v1/questions/{question_id}')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource Not Found')
+
 
 
 
