@@ -60,18 +60,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource Not Found')
 
-    # def test_delete_question_success(self):
-    #     question_id = 20
-    #     response = self.client().delete(f'/api/v1/questions/{question_id}')
-    #     data = json.loads(response.data)
+    def test_delete_question_success(self):
+        question_id = 20
+        response = self.client().delete(f'/api/v1/questions/{question_id}')
+        data = json.loads(response.data)
 
-    #     question = Question.query.filter_by(id=question_id).one_or_none()
+        question = Question.query.filter_by(id=question_id).one_or_none()
 
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertEqual(data['deleted'], question_id)
-    #     self.assertTrue(len(data['questions']))
-    #     self.assertEqual(question, None)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], question_id)
+        self.assertTrue(len(data['questions']))
+        self.assertEqual(question, None)
 
     def test_delete_question_not_found(self):
         question_id = 1000
@@ -82,22 +82,22 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource Not Found')
 
-    # def test_create_new_question_success(self):
-    #     payload = {
-    #         'question': 'Who is the chicken',
-    #         'answer': 'We am',
-    #         'category': 4,
-    #         'difficulty': 1
-    #     }
-    #     response = self.client().post(f'/api/v1/questions', json=payload)
-    #     data = json.loads(response.data)
+    def test_create_new_question_success(self):
+        payload = {
+            'question': 'Who is the chicken',
+            'answer': 'We am',
+            'category': 4,
+            'difficulty': 1
+        }
+        response = self.client().post(f'/api/v1/questions', json=payload)
+        data = json.loads(response.data)
 
-    #     question = Question.query.filter(Question.question.ilike(r'%Who is the chicken%')).one_or_none()
+        question = Question.query.filter(Question.question.ilike(r'%Who is the chicken%')).one_or_none()
 
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(data['success'], True)
-    #     self.assertTrue(question)
-    #     self.assertEqual(payload['question'], question.question)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(question)
+        self.assertEqual(payload['question'], question.question)
 
     def test_create_new_question_not_allowed(self):
         payload = {
@@ -125,6 +125,24 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
+
+    def test_get_question_by_category_success(self):
+        response = self.client().get('/api/v1/categories/1/questions')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(len(data['questions']))
+        self.assertTrue(data['current_category'])
+
+    def test_get_question_by_category_not_found(self):
+        response = self.client().get('/api/v1/categories/10000/questions')
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'Resource Not Found')
 
 
 
