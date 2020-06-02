@@ -60,15 +60,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource Not Found')
 
-    def test_delete_question_success(self):
-        question_id = 20
-        response = self.client().delete(f'/api/v1/questions/{question_id}')
-        data = json.loads(response.data)
+    # def test_delete_question_success(self):
+    #     question_id = 20
+    #     response = self.client().delete(f'/api/v1/questions/{question_id}')
+    #     data = json.loads(response.data)
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], question_id)
-        self.assertTrue(len(data['questions']))
+    #     question = Question.query.filter_by(id=question_id).one_or_none()
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertEqual(data['deleted'], question_id)
+    #     self.assertTrue(len(data['questions']))
+    #     self.assertEqual(question, None)
 
     def test_delete_question_not_found(self):
         question_id = 1000
@@ -78,6 +81,39 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Resource Not Found')
+
+    # def test_create_new_question_success(self):
+    #     payload = {
+    #         'question': 'Who is the man',
+    #         'answer': 'I am',
+    #         'category': 4,
+    #         'difficulty': 1
+    #     }
+    #     response = self.client().post(f'/api/v1/questions', json=payload)
+    #     data = json.loads(response.data)
+
+    #     question = Question.query.filter(Question.question.ilike(r'%Who is the man%')).one_or_none()
+
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertTrue(question)
+    #     self.assertEqual(payload['question'], question.question)
+
+    def test_create_new_question_not_allowed(self):
+        payload = {
+            'questions': 'What is 1000',
+            'answer': 1000,
+            'category': 4,
+            'difficulty': 1
+        }
+        response = self.client().post(f'/api/v1/questions/1', json=payload)
+        data = json.loads(response.data)
+
+        question = Question.query.filter(Question.question.ilike(r'%What is 1000%')).one_or_none()
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(question, None)
 
 
 
