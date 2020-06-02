@@ -165,32 +165,48 @@ def create_app(test_config=None):
 #   '''
     @app.route('/api/v1/questions', methods=['POST'])
     def create_question():
-        request_body = request.get_json()
-        new_question = request_body.get('question', None)
-        new_answer = request_body.get('answer', None)
-        new_category = int(request_body.get('category', None))
-        new_difficulty = int(request_body.get('difficulty', None))
+        if request.get_json().get('searchTerm'):
+            search_term = request.get_json().get('searchTerm')
+            search_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
 
-        try:
-            new_question = Question(
-                question=new_question,
-                answer=new_answer,
-                category=new_category,
-                difficulty=new_difficulty
-            )
-            new_question.insert()
+            if not search_questions:
+                abort(404)
+            else:
+                search_results = paginate(request, search_questions)
 
-            all_questions = Question.query.order_by(Question.id).all()
-            current_questions = paginate(request, all_questions)
-            
-            return jsonify({
-                'success': True,
-                'questions': current_questions['current_questions'],
-                'total_questions': current_questions['total_questions'],
-                'current_page': current_questions['current_page']
-            })
-        except:
-            abort(422)
+                return jsonify({
+                    'success': True,
+                    'questions': search_results['current_questions'],
+                    'total_questions': search_results['total_questions'],
+                    'current_page': search_results['current_page']
+                })
+        else:
+            request_body = request.get_json()
+            new_question = request_body.get('question', None)
+            new_answer = request_body.get('answer', None)
+            new_category = int(request_body.get('category', None))
+            new_difficulty = int(request_body.get('difficulty', None))
+
+            try:
+                new_question = Question(
+                    question=new_question,
+                    answer=new_answer,
+                    category=new_category,
+                    difficulty=new_difficulty
+                )
+                new_question.insert()
+
+                all_questions = Question.query.order_by(Question.id).all()
+                current_questions = paginate(request, all_questions)
+
+                return jsonify({
+                    'success': True,
+                    'questions': current_questions['current_questions'],
+                    'total_questions': current_questions['total_questions'],
+                    'current_page': current_questions['current_page']
+                })
+            except:
+                abort(422)
     '''
   @TODO: 
   Create a POST endpoint to get questions based on a search term. 
@@ -201,6 +217,7 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+    
     '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
