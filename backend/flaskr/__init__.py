@@ -219,13 +219,42 @@ def create_app(test_config=None):
                 abort(422)
 
     '''
-  @TODO: 
-  Create a GET endpoint to get questions based on category. 
+#   @TODO: 
+#   Create a GET endpoint to get questions based on category. 
 
-  TEST: In the "List" tab / main screen, clicking on one of the 
-  categories in the left column will cause only questions of that 
-  category to be shown. 
-  '''
+#   TEST: In the "List" tab / main screen, clicking on one of the 
+#   categories in the left column will cause only questions of that 
+#   category to be shown. 
+#   '''
+    @app.route('/api/v1/categories/<int:category_id>/questions')
+    def get_question_by_category(category_id):
+        selected_category = Category.query.filter_by(id=category_id).one_or_none()
+        # print(selected_category)
+
+        if selected_category is None:
+            abort(404)
+
+        questions = Question.query.filter_by(category=selected_category.id).order_by(Question.id).all()
+        # print(questions)
+
+        if not questions:
+            abort(404)
+
+        try:
+            current_questions = paginate(request, questions)
+            all_categories = Category.query.order_by(Category.id).all()
+            formatted_categories = {category.id:category.type for category in all_categories}
+
+            return jsonify({
+                'success': True,
+                'questions': current_questions['current_questions'],
+                'categories': formatted_categories,
+                'current_category': selected_category.type,
+                'total_questions': current_questions['total_questions'],
+                'current_page': current_questions['current_page']
+            })
+        except:
+            abort(422)
     '''
   @TODO: 
   Create a POST endpoint to get questions to play the quiz. 
@@ -237,10 +266,10 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
-    '''
-  @TODO: 
-  Create error handlers for all expected errors 
-  including 404 and 422. 
-  '''
+#     '''
+#   @TODO: 
+#   Create error handlers for all expected errors 
+#   including 404 and 422. 
+#   '''
 
     return app

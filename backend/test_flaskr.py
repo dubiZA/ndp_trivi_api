@@ -127,14 +127,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
 
     def test_get_question_by_category_success(self):
-        response = self.client().get('/api/v1/categories/1/questions')
+        category_id = 1
+        response = self.client().get(f'/api/v1/categories/{category_id}/questions')
         data = json.loads(response.data)
+
+        category = Category.query.filter_by(id=1).one_or_none()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
         self.assertTrue(data['current_category'])
+        self.assertEqual(category_id, category.id)
 
     def test_get_question_by_category_not_found(self):
         response = self.client().get('/api/v1/categories/10000/questions')
