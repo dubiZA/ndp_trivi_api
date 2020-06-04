@@ -218,14 +218,14 @@ def create_app(test_config=None):
             except:
                 abort(422)
 
-    '''
-#   @TODO: 
-#   Create a GET endpoint to get questions based on category. 
+#     '''
+# #   @TODO: 
+# #   Create a GET endpoint to get questions based on category. 
 
-#   TEST: In the "List" tab / main screen, clicking on one of the 
-#   categories in the left column will cause only questions of that 
-#   category to be shown. 
-#   '''
+# #   TEST: In the "List" tab / main screen, clicking on one of the 
+# #   categories in the left column will cause only questions of that 
+# #   category to be shown. 
+# #   '''
     @app.route('/api/v1/categories/<int:category_id>/questions')
     def get_question_by_category(category_id):
         selected_category = Category.query.filter_by(id=category_id).one_or_none()
@@ -266,6 +266,27 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+    @app.route('/api/v1/quizzes', methods=['POST'])
+    def start_quiz():
+        request_body = request.get_json()
+        selected_category = request_body.get('quiz_category')
+        previous_questions = request_body.get('previous_questions')
+
+        if selected_category['id'] == 0:
+            questions = Question.query.filter(Question.id.notin_(previous_questions)).order_by(Question.id).all()
+        else:
+            questions = Question.query.filter(Question.category == selected_category['id'], Question.id.notin_(previous_questions)).order_by(Question.id).all()
+
+        if not questions:
+            abort(404)
+        
+        available_questions = [question.format() for question in questions]
+        random_question = random.choice(available_questions)
+
+        return jsonify({
+            'success': True,
+            'question': random_question,
+        })
 #     '''
 #   @TODO: 
 #   Create error handlers for all expected errors 
