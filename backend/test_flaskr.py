@@ -176,6 +176,20 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(data['success'], False)
+    
+    def test_start_quiz_unprocessable_request(self):
+        payload = {
+            'previous_questions': [],
+            'quiz_category': {
+                'word': 'to',
+                'my': 'peeps'
+            }
+        }
+        response = self.client().post('/api/v1/quizzes', json=payload)
+        data = json.loads(response.data)
+
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(data['success'], False)
 
 
 # Make the tests conveniently executable
