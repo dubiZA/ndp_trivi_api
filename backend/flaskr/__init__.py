@@ -78,72 +78,89 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/categories')
     def get_categories():
-        ''' Handles requests for categories
+        ''' Handles requests for categories.
 
         Accepts get requests for categories and retrieves all categories from the database.
 
         Returns:
-            A JSON response reporting success and all categories as JSON objects.
-        
+            A JSON response reporting success and all categories as JSON objects or an HTTP
+            404 if there are no categories retrieved from the DB.
+
         Raises:
-            HTTP 400, Bad Request
+            An HTTP 422 is returned if the request cannot be successfully processed.
         '''
-        
-        categories = Category.query.order_by(Category.id).all()
+        try:
+            categories = Category.query.order_by(Category.id).all()
+        except:
+            abort(422)
 
         if not categories:
             abort(404)
 
-        try:
-            formatted_categories = {category.id:category.type for category in categories}
+        formatted_categories = {category.id:category.type for category in categories}
 
-            return jsonify({
-                'success': True,
-                'categories': formatted_categories
-            })
-        except:
-            abort(400)
+        return jsonify({
+            'success': True,
+            'categories': formatted_categories
+        })
 
     @app.route('/api/v1/questions')
     def get_questions():
-        ''' Handles requests for questions
+        ''' Handles requests for questions.
 
         Accepts get requests for questions and retrieves all questions from the database.
 
         Returns:
             A JSON response reporting success, a list of formatted questions, total questions
             the current page of results and all categories as JSON objects. If the are no
-            questions retrieved from the database, an HTTP 404 is returned
-        
+            questions retrieved from the database, an HTTP 404 is returned.
+
         Raises:
-            HTTP 400, Bad Request
+            An HTTP 422 is returned if the request cannot be successfully processed.
         '''
-        all_questions = Question.query.order_by(Question.id).all()
-        categories = Category.query.order_by(Category.id).all()
-
-        try:  
-            current_questions = paginate(request, all_questions)
-
-            if len(current_questions['current_questions']) == 0:
-                abort(404)
-
-            formatted_categories = {category.id:category.type for category in categories}
-
-            return jsonify({
-                'success': True,
-                'questions': current_questions['current_questions'],
-                'categories': formatted_categories,
-                'current_category': 'Placeholder',
-                'total_questions': current_questions['total_questions'],
-                'current_page': current_questions['current_page']
-            })
+        try:
+            all_questions = Question.query.order_by(Question.id).all()
+            categories = Category.query.order_by(Category.id).all()
         except:
-            abort(400)
+            abort(422)
+
+        current_questions = paginate(request, all_questions)
+
+        if len(current_questions['current_questions']) == 0:
+            abort(404)
+
+        formatted_categories = {category.id:category.type for category in categories}
+
+        return jsonify({
+            'success': True,
+            'questions': current_questions['current_questions'],
+            'categories': formatted_categories,
+            'current_category': 'Placeholder',
+            'total_questions': current_questions['total_questions'],
+            'current_page': current_questions['current_page']
+        })
 
     @app.route('/api/v1/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
-        question = Question.query.filter_by(id=question_id).one_or_none()
-        
+        ''' Handles delete requests for questions by ID.
+
+        Accepts delete requests for questions by ID and deletes the specified
+        question from the database.
+
+        Returns:
+            A JSON response reporting success, the question id for the deleted
+            question, a list of formatted questions, total questions the current
+            page of results and all categories as JSON objects. If the does not
+            exist in the database, an HTTP 404 is returned.
+
+        Raises:
+            An HTTP 422 is returned if the request cannot be successfully processed.
+        '''
+        try:
+            question = Question.query.filter_by(id=question_id).one_or_none()
+        except:
+            abort(422)
+
         if question is None:
                 abort(404)
 
@@ -164,6 +181,18 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/questions', methods=['POST'])
     def create_question():
+        ''' Handles post requests for question.
+
+        Accepts post requests for new questions that a users submits to the
+        database.
+
+        Returns:
+            A JSON response reporting success, a list of formatted questions, total
+            questions and the current page of results as JSON objects.
+
+        Raises:
+            An HTTP 422 is returned if the new question is unable to be added to the DB
+        '''
         if request.get_json().get('searchTerm'):
             search_term = request.get_json().get('searchTerm')
             search_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
@@ -209,6 +238,20 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/categories/<int:category_id>/questions')
     def get_question_by_category(category_id):
+        ''' Handles get requests for questions by category.
+
+        Accepts get requests for questions by a user selected category.
+
+        Returns:
+            A JSON response reporting success, a list of formatted questions, total
+            questions, all categories, the user selected current category and the
+            current page of results as JSON objects. If the category does not exist
+            in the DB or there are no questions for a valid category selection, an
+            HTTP 404 is returned.
+
+        Raises:
+            An HTTP 422 is returned if the request cannot be successfully processed.
+        '''
         selected_category = Category.query.filter_by(id=category_id).one_or_none()
 
         if selected_category is None:
@@ -237,6 +280,19 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/quizzes', methods=['POST'])
     def start_quiz():
+        ''' Handles post requests for quiz answer submissions.
+
+        Accepts post requests for questions by a user selected category. The
+        question is randomly selected and returned to the user for answer.
+
+        Returns:
+            A JSON response reporting success, a randomly selected question and the
+            remaining number of questions for the category selection as JSON objects.
+            If there are no questions, an HTTP 404 is returned.
+
+        Raises:
+            An HTTP 422 is returned if the request cannot be successfully processed.
+        '''
         request_body = request.get_json()
 
         selected_category = request_body.get('quiz_category')
