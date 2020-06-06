@@ -140,7 +140,7 @@ def create_app(test_config=None):
             'success': True,
             'questions': current_questions['current_questions'],
             'categories': formatted_categories,
-            'current_category': 'Placeholder',
+            'current_category': None,
             'total_questions': current_questions['total_questions'],
             'current_page': current_questions['current_page']
         })
