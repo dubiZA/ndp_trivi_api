@@ -8,6 +8,7 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+
 def paginate(request, selection):
     page = request.args.get('page', 1, type=int)
     start = (page - 1) * QUESTIONS_PER_PAGE
@@ -23,7 +24,6 @@ def paginate(request, selection):
     }
 
 
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
@@ -37,7 +37,6 @@ def create_app(test_config=None):
         response.headers.add('Access-Control-Allow-Headers',
                              'GET,PATH,POST,DELETE,OPTIONS')
         return response
-
 
     # ERROR HANDLERS
 
@@ -73,7 +72,6 @@ def create_app(test_config=None):
             'message': 'Unprocessable'
         }), 422
 
-
     # ROUTES
 
     @app.route('/api/v1/categories')
@@ -97,12 +95,12 @@ def create_app(test_config=None):
         if not categories:
             abort(404)
 
-        formatted_categories = {category.id:category.type for category in categories}
+        formatted_categories = {
+            category.id: category.type
+            for category in categories
+        }
 
-        return jsonify({
-            'success': True,
-            'categories': formatted_categories
-        })
+        return jsonify({'success': True, 'categories': formatted_categories})
 
     @app.route('/api/v1/questions')
     def get_questions():
@@ -129,7 +127,10 @@ def create_app(test_config=None):
         if len(current_questions['current_questions']) == 0:
             abort(404)
 
-        formatted_categories = {category.id:category.type for category in categories}
+        formatted_categories = {
+            category.id: category.type
+            for category in categories
+        }
 
         return jsonify({
             'success': True,
@@ -162,7 +163,7 @@ def create_app(test_config=None):
             abort(422)
 
         if question is None:
-                abort(404)
+            abort(404)
 
         try:
             question.delete()
@@ -195,7 +196,8 @@ def create_app(test_config=None):
         '''
         if request.get_json().get('searchTerm'):
             search_term = request.get_json().get('searchTerm')
-            search_questions = Question.query.filter(Question.question.ilike(f'%{search_term}%')).all()
+            search_questions = Question.query.filter(
+                Question.question.ilike(f'%{search_term}%')).all()
 
             if not search_questions:
                 abort(404)
@@ -216,12 +218,10 @@ def create_app(test_config=None):
             new_difficulty = int(request_body.get('difficulty', None))
 
             try:
-                new_question = Question(
-                    question=new_question,
-                    answer=new_answer,
-                    category=new_category,
-                    difficulty=new_difficulty
-                )
+                new_question = Question(question=new_question,
+                                        answer=new_answer,
+                                        category=new_category,
+                                        difficulty=new_difficulty)
                 new_question.insert()
 
                 all_questions = Question.query.order_by(Question.id).all()
@@ -252,12 +252,14 @@ def create_app(test_config=None):
         Raises:
             An HTTP 422 is returned if the request cannot be successfully processed.
         '''
-        selected_category = Category.query.filter_by(id=category_id).one_or_none()
+        selected_category = Category.query.filter_by(
+            id=category_id).one_or_none()
 
         if selected_category is None:
             abort(404)
 
-        questions = Question.query.filter_by(category=selected_category.id).order_by(Question.id).all()
+        questions = Question.query.filter_by(
+            category=selected_category.id).order_by(Question.id).all()
 
         if not questions:
             abort(404)
@@ -265,7 +267,10 @@ def create_app(test_config=None):
         try:
             current_questions = paginate(request, questions)
             all_categories = Category.query.order_by(Category.id).all()
-            formatted_categories = {category.id:category.type for category in all_categories}
+            formatted_categories = {
+                category.id: category.type
+                for category in all_categories
+            }
 
             return jsonify({
                 'success': True,
@@ -300,23 +305,27 @@ def create_app(test_config=None):
 
         try:
             if selected_category['id'] == 0:
-                questions = Question.query.filter(Question.id.notin_(previous_questions)).order_by(Question.id).all()
+                questions = Question.query.filter(
+                    Question.id.notin_(previous_questions)).order_by(
+                        Question.id).all()
             else:
-                questions = Question.query.filter(Question.category == selected_category['id'], Question.id.notin_(previous_questions)).order_by(Question.id).all()
+                questions = Question.query.filter(
+                    Question.category == selected_category['id'],
+                    Question.id.notin_(previous_questions)).order_by(
+                        Question.id).all()
         except:
             abort(422)
 
         if not questions:
             abort(404)
-        
+
         available_questions = [question.format() for question in questions]
         random_question = random.choice(available_questions)
 
         return jsonify({
             'success': True,
             'question': random_question,
-            'remaining_questions': len(available_questions)-1
+            'remaining_questions': len(available_questions) - 1
         })
-
 
     return app
