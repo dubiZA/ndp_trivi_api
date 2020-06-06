@@ -42,6 +42,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(400)
     def bad_request(error):
+        '''Returns a JSON formatted 400 error response'''
         return jsonify({
             'success': False,
             'error': 400,
@@ -50,6 +51,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(404)
     def not_found(error):
+        '''Returns a JSON formatted 404 error response'''
         return jsonify({
             'success': False,
             'error': 404,
@@ -58,6 +60,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(405)
     def method_not_allowed(error):
+        '''Returns a JSON formatted 405 error response'''
         return jsonify({
             'success': False,
             'error': 405,
@@ -66,6 +69,7 @@ def create_app(test_config=None):
 
     @app.errorhandler(422)
     def unprocessable(error):
+        '''Returns a JSON formatted 422 error response'''
         return jsonify({
             'success': False,
             'error': 422,
