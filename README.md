@@ -14,31 +14,39 @@ That's where you come in! Help them finish the trivia app so they can start hold
 
 Completing this trivia app will give you the ability to structure plan, implement, and test an API - skills essential for enabling your future applications to communicate with others. 
 
-## Tasks
+## Style Guide
 
-There are `TODO` comments throughout project. Start by reading the READMEs in:
+The Trivia API backend is written with PEP 8 as the style guide. Googles yapf formatter was used to format the code. For consistency, feel free to format using it. It can be installed with `pip install yapf` or view the [GitHub repo](https://github.com/google/yapf)
 
+## Getting Started
+
+To jump in right away, follow the sections below. For more detailed instructions, view the readme files for the frontend and backend here:
 1. [`./frontend/`](./frontend/README.md)
 2. [`./backend/`](./backend/README.md)
 
-We recommend following the instructions in those files in order. This order will look familiar from our prior work in the course.
+### Frontend
 
-## Starting and Submitting the Project
-
-[Fork](https://help.github.com/en/articles/fork-a-repo) the [project repository]() and [Clone](https://help.github.com/en/articles/cloning-a-repository) your forked repository to your machine. Work on the project locally and make sure to push all your changes to the remote repository before submitting the link to your repository in the Classroom. 
-
-## About the Stack
-
-We started the full stack application for you. It is desiged with some key functional areas:
+```bash
+# Change directory to the frontend directory if not already
+cd ./frontend
+npm install
+npm start
+```
+Open [http://localhost:3000](http://localhost:3000) to view the Trivia app in the browser. **Note**, the frontend will not function correctly until the backend is started.
 
 ### Backend
 
-The `./backend` directory contains a partially completed Flask and SQLAlchemy server. You will work primarily in app.py to define your endpoints and can reference models.py for DB and SQLAlchemy setup. 
-
-### Frontend
-
-The `./frontend` directory contains a complete React frontend to consume the data from the Flask server. You will need to update the endpoints after you define them in the backend. Those areas are marked with TODO and can be searched for expediency. 
-
-Pay special attention to what data the frontend is expecting from each API response to help guide how you format your API. 
-
-[View the README.md within ./frontend for more details.](./frontend/README.md)
+To set up the backend API server:
+```bash
+# From the project root directory, setup the database. Depending on your psql instance configuration, this may change. Also, check the trivia.psql file to make sure the correct username is being used.
+dropdb trivia && createdb trivia
+psql trivia < trivia.psql
+# Change directory to the backend directory
+cd ./backend
+# Install requirements in a virtual environment
+pip install -r requirements.txt
+# Prepare the Flask app to run.  Use 'set' instead of 'export' on Windows
+export FLASK_APP=flaskr
+export FLASK_ENV=development
+flask run
+```
