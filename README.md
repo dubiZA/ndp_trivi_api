@@ -20,11 +20,13 @@ The Trivia API backend is written with PEP 8 as the style guide. Googles yapf fo
 
 ## Getting Started
 
+### Quick Start
+
 To jump in right away, follow the sections below. For more detailed instructions, view the readme files for the frontend and backend here:
 1. [`./frontend/`](./frontend/README.md)
 2. [`./backend/`](./backend/README.md)
 
-### Frontend
+#### Frontend
 
 ```bash
 # Change directory to the frontend directory if not already
@@ -34,7 +36,7 @@ npm start
 ```
 Open [http://localhost:3000](http://localhost:3000) to view the Trivia app in the browser. **Note**, the frontend will not function correctly until the backend is started.
 
-### Backend
+#### Backend
 
 To set up the backend API server:
 ```bash
