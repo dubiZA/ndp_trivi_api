@@ -74,12 +74,27 @@ def create_app(test_config=None):
         }), 422
 
 
-# ROUTES
+    # ROUTES
 
     @app.route('/api/v1/categories')
     def get_categories():
+        ''' Handles requests for categories
+
+        Accepts get requests for categories and retrieves all categories from the database.
+
+        Returns:
+            A JSON response reporting success and all categories as JSON objects.
+        
+        Raises:
+            HTTP 400, Bad Request
+        '''
+        
+        categories = Category.query.order_by(Category.id).all()
+
+        if not categories:
+            abort(404)
+
         try:
-            categories = Category.query.order_by(Category.id).all()
             formatted_categories = {category.id:category.type for category in categories}
 
             return jsonify({
@@ -91,22 +106,39 @@ def create_app(test_config=None):
 
     @app.route('/api/v1/questions')
     def get_questions():
-        all_questions = Question.query.order_by(Question.id).all()
-        current_questions = paginate(request, all_questions)
-        categories = Category.query.order_by(Category.id).all()
-        formatted_categories = {category.id:category.type for category in categories}
+        ''' Handles requests for questions
 
-        if len(current_questions['current_questions']) == 0:
-            abort(404)
+        Accepts get requests for questions and retrieves all questions from the database.
+
+        Returns:
+            A JSON response reporting success, a list of formatted questions, total questions
+            the current page of results and all categories as JSON objects. If the are no
+            questions retrieved from the database, an HTTP 404 is returned
         
-        return jsonify({
-            'success': True,
-            'questions': current_questions['current_questions'],
-            'categories': formatted_categories,
-            'current_category': 'Placeholder',
-            'total_questions': current_questions['total_questions'],
-            'current_page': current_questions['current_page']
-        })
+        Raises:
+            HTTP 400, Bad Request
+        '''
+        all_questions = Question.query.order_by(Question.id).all()
+        categories = Category.query.order_by(Category.id).all()
+
+        try:  
+            current_questions = paginate(request, all_questions)
+
+            if len(current_questions['current_questions']) == 0:
+                abort(404)
+
+            formatted_categories = {category.id:category.type for category in categories}
+
+            return jsonify({
+                'success': True,
+                'questions': current_questions['current_questions'],
+                'categories': formatted_categories,
+                'current_category': 'Placeholder',
+                'total_questions': current_questions['total_questions'],
+                'current_page': current_questions['current_page']
+            })
+        except:
+            abort(400)
 
     @app.route('/api/v1/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
