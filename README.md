@@ -70,10 +70,10 @@ There is no authentication required for this API or any of it's endpoints at thi
 
 Clients should expect to recieve one of several types of HTTP error response codes if something goes wrong or a request is not correctly submitted. Error response messages are returned as JSON. Response codes include:
 
-+ 400 Bad Request
-+ 404 Not Found
-+ 405 Method Not Allowed
-+ 422 Unprocessable
++ `400` Bad Request
++ `404` Not Found
++ `405` Method Not Allowed
++ `422` Unprocessable
 
 The JSON error response will have the following structure:
 
@@ -84,3 +84,25 @@ The JSON error response will have the following structure:
     'message': 'Resource Not Found'
 }
 ```
+
+## Endpoint Reference
+
+What follows is the API endpoint reference. The URL pattern would be \[base_url\]/endpoint. For example <http://localhost:5000/api/v1/questions>
+
+### GET /api/v1/categories
+
+Handles requests for categories. When a request is submitted to this endpoint, all categories in the database will be sent to the user in a JSON response.
+
+The JSON response has the following format:
+
+```javascript
+{
+    'success': True,
+    'categories': {
+        '1': 'Science',
+        '2': 'History',
+        '3': 'etc'
+    }
+}
+```
+
