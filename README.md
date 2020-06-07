@@ -94,8 +94,10 @@ What follows is the API endpoint reference. The URL pattern would be \[base_url\
 
 Handles requests for categories. When a request is submitted to this endpoint, all categories in the database will be sent to the user in a JSON response.
 
+Sample request `curl http://localhost:5000/api/v1/categories`
+
 The JSON response is an object with keys and values:
-+ success: True (bool)
++ success: True (boolean)
 + categories: (JSON object)
     + category_id: category_name (string)
 
@@ -110,3 +112,51 @@ The JSON response is an object with keys and values:
 }
 ```
 
+
+### GET /api/v1/questions
+
+Handles requests for questions. When a request is submitted to this endpoint, all questions in the database will be sent to the user in a JSON response with additional data that may be useful to the requesting client. This endpoint returns a paginated response with a hardcoded page size of 10 items per page.
+
+Sample request `curl http://localhost:5000/api/v1/questions`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ questions: (array of JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ categories: (JSON object)
+    + category_id: category_name (string)
++ current_category: None
++ total_questions: (int)
++ current_page: (int)
+
+```javascript
+{
+    'success': True,
+    'questions': [{
+        'id': 1,
+        'questions': 'Foo',
+        'answer': 'Bar',
+        'category' 'Baz',
+        'Difficulty': 1
+    },
+    {
+        'id': 1,
+        'questions': 'Baz',
+        'answer': 'Bar',
+        'category' 'Foo',
+        'Difficulty': 4
+    }],
+    'categories': {
+        '1': 'Science',
+        '2': 'History',
+        '3': 'etc'
+    },
+    'current_category': None,
+    'total_questions': 30,
+    'current_page': 1
+}
+```
