@@ -94,7 +94,7 @@ What follows is the API endpoint reference. The URL pattern would be \[base_url\
 
 Handles requests for categories. When a request is submitted to this endpoint, all categories in the database will be sent to the user in a JSON response.
 
-Sample request `curl http://localhost:5000/api/v1/categories`
+Sample request: `curl http://localhost:5000/api/v1/categories`
 
 The JSON response is an object with keys and values:
 + success: True (boolean)
@@ -117,7 +117,7 @@ The JSON response is an object with keys and values:
 
 Handles requests for questions. When a request is submitted to this endpoint, all questions in the database will be sent to the user in a JSON response with additional data that may be useful to the requesting client. This endpoint returns a paginated response with a hardcoded page size of 10 items per page.
 
-Sample request `curl http://localhost:5000/api/v1/questions`
+Sample request: `curl http://localhost:5000/api/v1/questions`
 
 The JSON response is an object with the keys and value data types:
 + success: (boolean)
@@ -167,7 +167,7 @@ The JSON response is an object with the keys and value data types:
 
 Handles delete requests for a specific question in the questions collection. When a request is submitted to this endpoint, the question is looked up in the database and deleted from. A JSON response is sent to the user to confirm the delete action with additional data that may be useful to the requesting client, like all the questions remaining in the database, count of all questions remaining and the current page number. This endpoint takes an integer as the final part of the URL.
 
-Sample request `curl -X DELETE http://localhost:5000/api/v1/questions/1`
+Sample request: `curl -X DELETE http://localhost:5000/api/v1/questions/1`
 
 The JSON response is an object with the keys and value data types:
 + success: (boolean)
@@ -214,7 +214,7 @@ When a search term is not found in the POST request, the endpoint will take a PO
 + category: (int)
 + difficulty: (int)
 
-Sample request `curl -X POST -H 'Content-Type: application/json' -d '{"question": "Foo", "answer": "Bar", "category": "1", "difficulty": "2"}' http://localhost:5000/api/v1/questions/`
+Sample request: ```curl -X POST -H 'Content-Type: application/json' -d '{"question": "Foo", "answer": "Bar", "category": "1", "difficulty": "2"}' http://localhost:5000/api/v1/questions/```
 
 The JSON response is an object with the keys and value data types:
 + success: (boolean)
