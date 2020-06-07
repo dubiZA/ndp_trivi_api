@@ -136,27 +136,154 @@ The JSON response is an object with the keys and value data types:
 ```javascript
 {
     'success': True,
-    'questions': [{
-        'id': 1,
-        'questions': 'Foo',
-        'answer': 'Bar',
-        'category' 'Baz',
-        'Difficulty': 1
-    },
-    {
-        'id': 1,
-        'questions': 'Baz',
-        'answer': 'Bar',
-        'category' 'Foo',
-        'Difficulty': 4
-    }],
+    'questions': [
+        {
+            'id': 1,
+            'questions': 'Foo',
+            'answer': 'Bar',
+            'category' 'Baz',
+            'Difficulty': 1
+        },
+        {
+            'id': 2,
+            'questions': 'Baz',
+            'answer': 'Bar',
+            'category' 'Foo',
+            'Difficulty': 4
+        }
+    ],
     'categories': {
         '1': 'Science',
         '2': 'History',
         '3': 'etc'
     },
     'current_category': None,
-    'total_questions': 30,
+    'total_questions': 2,
     'current_page': 1
 }
 ```
+
+### DELETE /api/v1/questions/[question_id]
+
+Handles delete requests for a specific question in the questions collection. When a request is submitted to this endpoint, the question is looked up in the database and deleted from. A JSON response is sent to the user to confirm the delete action with additional data that may be useful to the requesting client, like all the questions remaining in the database, count of all questions remaining and the current page number. This endpoint takes an integer as the final part of the URL.
+
+Sample request `curl -X DELETE http://localhost:5000/api/v1/questions/1`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ deleted: (int)
++ questions: (array of JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ total_questions: (int)
++ current_page: (int)
+
+```javascript
+{
+    'success': True,
+    'deleted': 1
+    'questions': [
+        {
+            'id': 2,
+            'questions': 'Baz',
+            'answer': 'Bar',
+            'category' 'Foo',
+            'Difficulty': 1
+        }
+    ],
+    'total_questions': 1,
+    'current_page': 1
+}
+```
+If the question cannot be deleted an error is returned. If they question does not exist in the database a 404 is returned.
+
+### POST /api/v1/questions
+
+Handles POST requests for either:
++ Creating a new question in the database
++ Searching for an existing question by question text with partial matches supported
+
+#### Creating a new question
+
+When a search term is not found in the POST request, the endpoint will take a POST request for a new question. The payload should have the following keys and value data types:
++ question: (string)
++ answer: (string)
++ category: (int)
++ difficulty: (int)
+
+Sample request `curl -X POST -H 'Content-Type: application/json' -d '{"question": "Foo", "answer": "Bar", "category": "1", "difficulty": "2"}' http://localhost:5000/api/v1/questions/`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ questions: (array of JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ total_questions: (int)
++ current_page: (int)
+
+```javascript
+{
+    'success': True,
+    'questions': [
+        {
+            'id': 2,
+            'questions': 'Baz',
+            'answer': 'Bar',
+            'category' 'Foo',
+            'Difficulty': 1
+        },
+        {
+            'id': 3,
+            'questions': 'Foo',
+            'answer': 'Bar',
+            'category' 'Baz',
+            'Difficulty': 2
+        }
+    ],
+    'total_questions': 2,
+    'current_page': 1
+}
+```
+If the question cannot be added an error is returned.
+
+#### Searching for a question
+
+When a search term is found in the POST request, the endpoint will request any questions matching the submitted string from the database. The search term is not case sensitive. The payload should have the following key and value data type:
++ searchTerm: (string)
+
+Sample request `curl -X POST -H 'Content-Type: application/json' -d '{"searchTerm": "foo"}' http://localhost:5000/api/v1/questions/`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ questions: (array of JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ total_questions: (int)
++ current_page: (int)
+
+```javascript
+{
+    'success': True,
+    'questions': [
+        {
+            'id': 3,
+            'questions': 'Foo',
+            'answer': 'Bar',
+            'category' 'Baz',
+            'Difficulty': 2
+        }
+    ],
+    'total_questions': 2,
+    'current_page': 1
+}
+```
+If the search term cannot be found an error is returned.
