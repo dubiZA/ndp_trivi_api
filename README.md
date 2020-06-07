@@ -87,13 +87,17 @@ The JSON error response will have the following structure:
 
 ## Endpoint Reference
 
-What follows is the API endpoint reference. The URL pattern would be \[base_url\]/endpoint. For example <http://localhost:5000/api/v1/questions>
+What follows is the API endpoint reference. The URL pattern would be \[base_url\]/endpoint, for example:
+<http://localhost:5000/api/v1/questions>
 
 ### GET /api/v1/categories
 
 Handles requests for categories. When a request is submitted to this endpoint, all categories in the database will be sent to the user in a JSON response.
 
-The JSON response has the following format:
+The JSON response is an object with keys and values:
++ success: True (bool)
++ categories: (JSON object)
+    + category_id: category_name (string)
 
 ```javascript
 {
