@@ -214,7 +214,7 @@ When a search term is not found in the POST request, the endpoint will take a PO
 + category: (int)
 + difficulty: (int)
 
-Sample request: ```curl -X POST -H 'Content-Type: application/json' -d '{"question": "Foo", "answer": "Bar", "category": "1", "difficulty": "2"}' http://localhost:5000/api/v1/questions/```
+Sample request: `curl -X POST -H 'Content-Type: application/json' -d '{"question": "Foo", "answer": "Bar", "category": "1", "difficulty": "2"}' http://localhost:5000/api/v1/questions/`
 
 The JSON response is an object with the keys and value data types:
 + success: (boolean)
@@ -257,7 +257,7 @@ If the question cannot be added an error is returned.
 When a search term is found in the POST request, the endpoint will request any questions matching the submitted string from the database. The search term is not case sensitive. The payload should have the following key and value data type:
 + searchTerm: (string)
 
-Sample request `curl -X POST -H 'Content-Type: application/json' -d '{"searchTerm": "foo"}' http://localhost:5000/api/v1/questions/`
+Sample request: `curl -X POST -H 'Content-Type: application/json' -d '{"searchTerm": "foo"}' http://localhost:5000/api/v1/questions/`
 
 The JSON response is an object with the keys and value data types:
 + success: (boolean)
@@ -287,3 +287,85 @@ The JSON response is an object with the keys and value data types:
 }
 ```
 If the search term cannot be found an error is returned.
+
+### GET /api/v1/categories/[category_id]/questions
+
+Handles GET requests for a specific category and all related questions in the collection. When a request is submitted to this endpoint, the category is looked up in the database and only questions with a matching category ID are returned. A JSON response is sent to the user with the questions for the specified category as well as a count of all questions remaining and the current page number.
+
+Sample request: `curl http://localhost:5000/api/v1/categories/3/questions`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ questions: (array of JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ categories: (JSON object)
+    + category_id: category_name (string)
++ current_category: (string)
++ total_questions: (int)
++ current_page: (int)
+
+```javascript
+{
+    'success': True,
+    'questions': [
+        {
+            'id': 1,
+            'questions': 'Foo',
+            'answer': 'Bar',
+            'category' 'Baz',
+            'Difficulty': 1
+        },
+        {
+            'id': 2,
+            'questions': 'Baz',
+            'answer': 'Bar',
+            'category' 'Baz',
+            'Difficulty': 4
+        }
+    ],
+    'categories': {
+        '1': 'Science',
+        '2': 'History',
+        '3': 'Baz'
+    },
+    'current_category': 'Baz',
+    'total_questions': 2,
+    'current_page': 1
+}
+```
+If the category or questions cannot be found in the database a 404 is returned.
+
+### POST /api/v1/quizzes
+
+Handles GET requests for the quiz game. When a request is submitted to this endpoint, the category is looked up in the database and only questions with a matching category are returned. A JSON response is sent to the user with a randomly chosen question for the specified category as well as a count of all questions remaining in the question set. The endpoint also take a list of previously asked questions and excludes them from the question pool with each subsequent request to the endpoint.
+
+Sample request: `curl -X POST -H 'Content-Type: application/json' -d '{"quiz_category": "Foo", "previous_questions": "[]"}' http://localhost:5000/api/v1/quizzes/`
+
+The JSON response is an object with the keys and value data types:
++ success: (boolean)
++ question: (JSON objects)
+    + id: (int)
+    + question: (string)
+    + answer: (string)
+    + category: (string)
+    + difficulty: (int)
++ remaining_questions: (int)
+
+```javascript
+{
+    'success': True,
+    'question': {
+        'id': 1,
+        'questions': 'Foo',
+        'answer': 'Bar',
+        'category' 'Baz',
+        'Difficulty': 1
+    },
+    'remaining_questions': 2
+}
+```
+If there are no question for the selected category, a 404 is returned.
